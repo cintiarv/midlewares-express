@@ -1,4 +1,5 @@
 import express from 'express'
+import { StatusHttp } from './errorCustom.js'
 import kodersRouter from './routers/koders.router.js'
 
 const server = express()
@@ -32,18 +33,45 @@ server.use('/koders', kodersRouter)
 
 //Endpoint
 server.get('/', (request, response) => {
-    console.log('Desde: GET/');
-    console.log(request.oranges);
-    response.json({
-        message: 'Middlewares en express'
-    })
+    try{
+        throw new StatusHttp('Ocurrió un error', 500)
+        console.log('Desde: GET/');
+        console.log(request.oranges);
+        response.json({
+            message: 'Middlewares en express'
+        })
+    }catch(error){
+        response.status(error.status).json({
+            success:false,
+            message:error.message
+        })
+    }
+    
 })
 
-server.get('/hola', (request, response) => {
-    response.json({
-        message:'Hola desde express'
-    })
+server.get('/hola', (request, response, next) => {
+    try{
+        response.json({
+            message:'Hola desde express'
+        })
+    } catch(error){
+        /* response.status(400).json({
+            success:false,
+            message:error.message
+        }) */
+        next((error))
+    }
+    
 })
+
+function handleErrors (error, request, response){ //en este caso next ya no es necesario ya que se ejecuta después del endpoint 
+    response.status(error.status).json({
+        succes: false,
+        message: 'Server internal error'
+    })
+}
+
+server.use(handleErrors)
 
 /* 
 Un middleware es una función
