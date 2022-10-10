@@ -3,24 +3,35 @@ import express from 'express'
 const router = express.Router()
 
 router.use((request, response, next) => {
-    console.log('Este es un middleware a nivel de router');
+    console.log('Este es un middleware a nivel del router de koders ')
     next()
 })
 
-router.get('/',(request, response, next) => {
-    console.log('Este es un middleware del endpoint GET/ koders');
-next()
+function myMiddleware(request, response, next) {
+    console.log('Este es un middleware del endpoint GET /koders')
+    next()
 }
-, (request, response) => {
-    response.json({
-        mesage: 'Aqui estarán todos los koders'
-    })
+
+router.get('/', myMiddleware, (request, response) => {
+    try {
+        response.json({
+            message: 'Aqui estarán todos los koders'
+        })
+    } catch (error) {
+        next(error)
+    }
+    
 })
 
-router.post ('/', (request, response) => {
-    response.json({
-        mesage: 'Aqui se crearán koders'
-    })
+router.post('/', (request, response) => {
+    try {
+        response.json({
+            message: 'Aqui se crearán koders'
+        })
+    } catch (error) {
+        next(error)
+    }
+    
 })
 
 export default router
